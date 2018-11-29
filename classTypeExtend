@@ -1,0 +1,28 @@
+//类式继承
+function SuperClass(){ //父类
+    this.superName = '类式继承-父类';
+    this.superArr = ['a','b'];
+}
+SuperClass.prototype.getSuperName = function(){ //父类原型方法
+    return this.superName;
+}
+function SubClass(){ //子类
+    this.subName = '类式继承-子类';
+    this.subArr = [1,2];
+}
+var superInstance = new SuperClass(); //父类实例
+SubClass.prototype = superInstance;  //继承父类
+SubClass.prototype.getSubName = function(){ //子类原型方法
+    return this.subName;
+}
+var instance1 = new SubClass(); //子类的实例
+var instance2 = new SubClass();//子类的实例
+console.log(instance1.superArr,
+    instance1.getSuperName(),
+    instance1.subArr,
+    instance1.getSubName()); //'a,b' '类式继承-父类' [1,2] '类式继承-子类'
+    
+instance1.subArr.push(3); //更改子类的实例属性引用值
+instance1.superArr.push('c');//更改父类的实例属性引用值
+
+console.log(instance2.superArr,instance2.subArr) // 'a,b,c' [1,2] 由于是引用类型所以其他实例上的属性也被更改
