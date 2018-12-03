@@ -11,4 +11,4 @@ function Fn(name,age){
 }
 
 var person1 = Fn('11',10)
-var person2 = Fn('11',1yu0)
+var person2 = Fn('11',10)
