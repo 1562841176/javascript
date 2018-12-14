@@ -38,24 +38,6 @@ this.$http.jsonp('http://www.domain2.com:8080/login', {
     console.log(res); 
 })
 
-// 后端node.js代码实例
-var queryString=require('querystring);
-var http=require('http');
-var server =http.createServer();
-
-server.on('request',function(req,res){
-	var params=querystring.parse(req.url.split('?')[1]);
-	var fn=params.callback;
-	
-	
-	//jsonp返回设置
-	res.writeHead(200,{'Content-Type':'text/javascript'});
-	res.write(fn+'('+JSON.stringify(params)+')');
-	
-	
-	res.end();
-})
-
 
 //jsonp缺点：只能实现get一种请求
 
