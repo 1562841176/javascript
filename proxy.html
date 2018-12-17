@@ -1,0 +1,144 @@
+<html>
+
+<head>
+
+    <head>
+
+        <head>
+            <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+            <title>proxy</title>
+        </head>
+
+    <body>
+        <script>
+            // Proxy 用于修改某些操作的默认行为。等同于在语言层做出修改。
+            // Proxy 可以理解为在目标对象之前架一层拦截，外界对该对象的访问，都必须通过这层拦截，因此提供了
+            // 一种机制，可以对外界的访问进行过滤和改写
+            
+
+
+            // var p = new Proxy(target, handler);
+            // target :代理对象，其声明了代理target的一些操作，p是代理后的对象
+            // 当外界每次对p进行操作时，就会执行handler对象的一些方法。handler能代理一些常用的方法如下：
+            // .get:读取
+            // .set:修改
+            // .has:判断对象是否有该属性
+            // .construct:构造函数
+
+            var target = {
+                name: 'obj'
+            };
+            var logHandler = {
+                get: function (target, key) {
+                    console.log(`${key}被读取`)
+                },
+                set: function (target, key, value) {
+                    console.log(`${key}被设置为${value}`);
+                    target[key] = value;
+                }
+            }
+            var targetWithLog = new Proxy(target, logHandler);
+            targetWithLog.name; // 控制台输出：name 被读取
+            targetWithLog.name = 'others'; // 控制台输出：name 被设置为 others
+            console.log(target.name); // 控制台输出: others
+
+            var person = {
+                fisrsName: '张',
+                lastName: '小白'
+            };
+            var proxyedPerson = new Proxy(person, {
+                get: function (target, key) {
+                    if (key === 'fullName') {
+                        return [target.fisrsName, target.lastName].join(' ');
+                    }
+                    return target[key];
+                },
+                set: function (target, key, value) {
+                    if (key === 'fullName') {
+                        var fullNameInfo = value.split(' ');
+                        target.fisrsName = fullNameInfo[0];
+                        target.lastName = fullNameInfo[1];
+                    } else {
+                        target[key] = value;
+                    }
+                }
+            });
+
+            console.log('姓:%s, 名:%s, 全名: %s', proxyedPerson.fisrsName, proxyedPerson.lastName, proxyedPerson.fullName); // 姓:张, 名:小白, 全名: 张 小白
+            proxyedPerson.fullName = '李 小露';
+            console.log('姓:%s, 名:%s, 全名: %s', proxyedPerson.fisrsName, proxyedPerson.lastName, proxyedPerson.fullName); // 姓:李, 名:小露, 全名: 李 小露
+            console.log('**********');
+
+
+            var api = {
+                _secret: 'xxxx',
+                _otherSec: 'bbb',
+                ver: 'v0.0.1'
+            };
+
+            api = new Proxy(api, {
+                get: function (target, key) {
+                    // 以 _ 下划线开头的都认为是 私有的
+                    if (key.startsWith('_')) {
+                        console.log('私有变量不能被访问');
+                        return false;
+                    }
+                    return target[key];
+                },
+                set: function (target, key, value) {
+                    if (key.startsWith('_')) {
+                        console.log('私有变量不能被修改');
+                        return false;
+                    }
+                    target[key] = value;
+                },
+                has: function (target, key) {
+                    return key.startsWith('_') ? false : (key in target);
+                }
+            });
+
+            api._secret; // 私有变量不能被访问
+            console.log(api.ver); // v0.0.1
+            api._otherSec = 3; // 私有变量不能被修改
+            console.log('_secret' in api); //false
+            console.log('ver' in api); //true
+
+
+            function Animal() {
+                return createValidator(this, animalValidator);
+            }
+
+            var animalValidator = {
+                name: function (name) {
+                    return typeof name === 'string'
+                }
+            }
+
+            function createValidator(target, validator) {
+                return new Proxy(target, {
+                    set: function (target, key, value) {
+                        console.log(validator[key])
+                        if (validator[key]) {
+                            // 符合验证条件
+                          
+                            if (validator[key](value)) {
+                                target[key] = value;
+                            } else {
+                                throw Error(`Cannot set ${key} to ${value}. Invalid.`);
+                            }
+                        } else {
+                            target[key] = value
+                        }
+                    }
+                })
+            }
+
+            var dog = new Animal();
+            dog.name = 'dog';
+            console.log(dog.name);
+            dog.name = 123; // Uncaught Error: Cannot set name to 123. Invalid.
+        </script>
+
+    </body>
+
+</html>
