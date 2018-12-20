@@ -1,0 +1,33 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>generator</title>
+    <!-- 告诉浏览器该页面是自适应布局 -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+</head>
+
+<body>
+    <div id="one">
+        one
+        <div id="two">two</div>
+    </div>
+    <script>
+
+    // target: 触发事件的某个具体对象，只会出现在事件流的目标阶段
+    // currentTarget: 绑定事件的对象，恒等于this,可能出现在事件流的任意一个阶段
+    // 通常情况下target和currentTarget是一致的，只要使用target即可，但是有一种情况必须区分这三者之间的关系，那就是在父子嵌套的关系中，父元素绑定了事件，单击了子元素（根据事件流，在不阻止事件流的前提下他会传递至父元素，导致父元素的事件处理函数执行），
+    // 这时候currentTarget指向的是父元素，因为他是绑定事件的对象，而target指向了子元素，因为他是触发事件的那个具体对象，
+
+     var one =document.getElementById("one");
+     one.addEventListener('click',function(e){
+        console.log(e.target);  //three
+        console.log(e.currentTarget);  //one
+     },false)
+    </script>
+
+</body>
+
+</html>
