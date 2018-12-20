@@ -1,0 +1,91 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>copy</title>
+    <!-- 告诉浏览器该页面是自适应布局 -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+</head>
+
+<body>
+    <div id="one">
+
+    </div>
+    <script>
+        var a1 = {};
+        var a2 = {
+            namex: 'xxx',
+            getName: function () {
+                alert(namex);
+            },
+            xx: {
+                namexx: "xxx",
+
+            }
+        }
+        var copy = function () {
+            // 浅拷贝
+            var name, target = arguments[0],
+                src = arguments[1];
+            for (name in src) {
+                if (src[name] === target[name]) {
+                    continue;
+                }
+                target[name] == src[name]
+            }
+        }
+        copy(a1, a2);
+        console.info(a1);
+
+        var deepCopy = function () {
+            var name, target = arguments[0],
+                src = arguments[1];
+            // 再做个判断，若是再次拷贝时，target[name]很可能为空
+            if (!(typeof (target) === "object")) {
+                target = {};
+            }
+            for (name in src) {
+                if (src[name] === target[name]) {
+                    continue;
+                }
+                /* 
+                if( target !==null && typeof(src[name])==="object"){ 
+                    target[name]=deepCopy(target[name],src[name]); 
+                }else{ 
+                    target[name]=src[name]; 
+                } 
+                */
+
+                if (src[name] !== null && typeof (src[name]) === "object") {
+                    //src就是引用xx  --->target -------->  {namexx:"xxx",}   
+                    target[name] = deepCopy(target[name], src[name]);
+                    //target[name]=deepCopy(target[name]!==undefined?target[name]:{} ,src[name]);  
+                    console.trace();
+                } else if (src[name] !== undefined) {
+                    target[name] = src[name];
+                }
+                //target[name]=src[name];  
+            }
+            return target;
+        }
+        var a3 = {};
+        var a4 = {
+            namex: "xxx",
+            getName: function () {
+                alert(namex);
+            },
+            xx: {
+                namexx: "xxx",
+            }
+        };
+        deepCopy(a3, a4);
+        console.info(a3);
+        a4.namex = "我是谁"; //深拷贝后不会再受到影响  
+        console.info(a3);
+    </script>
+
+</body>
+
+</html>
