@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <mate charset="utf-8">
+        <mate http-equive="X-UA-Compatible" content="IE=edge">
+            <mate content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+                <title>promise</title>
+</head>
+
+<body>
+    <script>
+        // call方法第一个参数是要绑定给this的值，后面传入的是一个参数列表。当第一个值为null,undefined的时候，默认指向window
+
+        // apply 接受两个参数，第一个参数是要绑定给this的值，第二个参数是一个参数数组。当第一个值为null,undefined的时候，默认指向window
+
+
+        // bind和call很相似，第一个参数是this的指向，从第二个参数开始是接受的参数列表。区别在于bind方法返回值是函数以及bind接受的参数
+        // 列表的使用。bind方法不会立即执行，而是返回了一个改变了上下文this后的函数。
+
+
+        // Promise是按照顺序来执行callback的，并且由resolve触发
+        function Promise(func) { //接受一个函数作为参数
+            this.state='pending';
+            this.doneList = []; //callback列表
+            func(this.resolve.bind(this)); // 顺带绑定this对象
+        }
+        Promise.prototype = {
+            resolve: function () {
+                while (true) {
+                    if (this.doneList.length === 0) {
+                        this.state='done';
+                        break;
+                    }
+                    this.doneList.shift().apply(this);
+                }
+
+
+            },
+            then: function (callback) { //接受函数作为参数
+                this.doneList.push(callback); //加入到回调队列
+
+                if(this.state==='done'){
+                    this.state='pending';
+                    this.resolve();
+                }
+                return this; // 支持链式调用
+            }
+        }
+        var p =new Promise(function(resolve){
+            console.log('a');
+            resolve();
+        }).then(function(){
+            console.log('b');
+        }).then(function(){
+            console.log('c');
+        });
+    
+        console.log(p);
+    </script>
+</body>
+
+</html>
