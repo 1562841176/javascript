@@ -1,0 +1,108 @@
+<html>
+
+<head>
+    <mate charset="utf-8">
+        <mate http-equive="X-UA-Compatible" content="IE=edge">
+            <mate content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+                <title>promise</title>
+</head>
+
+<body>
+    <script>
+        function getUserId(){
+            return new Promise(function(resolve){
+                resolve(9878)
+            })
+        }
+        getUserId().then(function(id){
+            console.log(id)
+        }, function(error) {
+            console.log(error)
+        })
+            function Promise(fn){
+            var state='pending',
+            value=null,
+            callbacks=[];//callbacks为数组，因为可能同时有很多个回调
+           
+            this.then=function(onFulfilled,onRejected){
+                // if(state=='pending'){ 
+                //     callbacks.push(onFulfilled);
+                //     return this;
+                // }
+                // onFulfilled(value);
+                // return this;
+                return new Promise (function(resolve,reject){
+                    handle({
+                        onFulfilled:onFulfilled || null,
+                        onRejected:onRejected || null,
+                        resolve:resolve,
+                        reject:reject
+                    })
+                })
+                
+            }
+
+            function handle(callback){
+                if(state=='pending'){ 
+                    callbacks.push(callback);
+                    return this;
+                }
+
+                var cb=state==='fulfilled' ? callback.onFulfilled :callback.onRejected,
+                    ret;
+
+                if(cb===null){
+                    cb=state==='fulfilled'?callback.resolve : callback.reject;
+                    cb(value);
+                    return;
+                }
+                ret=cb(value);
+                callback.resolve(ret);
+
+
+                //如果then中没有传递任何东西     
+                // if(callback.onResolved){
+                //     callback.resolve(value)
+                // }
+
+                // var ret=callback.onFulfilled(value);
+                // callback.resolve(ret)
+            }
+ 
+
+            // 加入延迟机制---setTimeout机制，将resolve中执行回调的逻辑放置到JS任务队列末尾，
+            // 以保证在resolve执行时，then方法的回调函数已经注册完成.
+            function resolve(newValue){
+                if(newValue && (typeof newValue==='object' || typeof newValue === 'function')){
+                    var then =newValue.then;
+                    if(typeof then ==='function'){
+                        then.call(newValue,resolve,reject)
+                    }
+                }
+                value=newValue;
+                state='fulfilled';
+                execute()
+                
+            }
+            function reject(reason){
+                state='rejected';
+                value=reason;
+                execute()
+
+            }
+
+            function execute(){
+                setTimeout(function(){
+                    callbacks.forEach(function(callback){
+                      handle(callback);
+                    });
+                },0)
+            }
+            fn(resolve, reject);
+        }
+
+
+    </script>
+</body>
+
+</html>
