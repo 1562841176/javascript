@@ -19,11 +19,11 @@
         }, function(error) {
             console.log(error)
         })
-            function Promise(fn){
+        function Promise(fn){
             var state='pending',
             value=null,
             callbacks=[];//callbacks为数组，因为可能同时有很多个回调
-           
+        
             this.then=function(onFulfilled,onRejected){
                 // if(state=='pending'){ 
                 //     callbacks.push(onFulfilled);
@@ -68,7 +68,7 @@
                 // var ret=callback.onFulfilled(value);
                 // callback.resolve(ret)
             }
- 
+
 
             // 加入延迟机制---setTimeout机制，将resolve中执行回调的逻辑放置到JS任务队列末尾，
             // 以保证在resolve执行时，then方法的回调函数已经注册完成.
@@ -94,7 +94,7 @@
             function execute(){
                 setTimeout(function(){
                     callbacks.forEach(function(callback){
-                      handle(callback);
+                    handle(callback);
                     });
                 },0)
             }
